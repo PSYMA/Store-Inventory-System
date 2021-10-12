@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store Inventory</title>
+    <link href="~/store.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <style>
+        .center {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .div-center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .button {
+            background-color: white;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block; 
+        }
+
+        .button-rad-50 {
+            border-radius: 50%
+        }
+
+        .page-link {
+            right: 0 !important;
+            display: inline-block;
+            cursor: pointer
+        }
+
+        #example_paginate > span > a {
+            display: inline-block !important;
+            position: relative;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            margin-left: -1px;
+            line-height: 1.25;
+            color: #007bff;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+        }
+
+        #example_paginate > a {
+            display: inline-block !important;
+            position: relative;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            margin-left: -1px;
+            line-height: 1.25;
+            color: #007bff;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+        }
+    </style>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2021 - Store Inventory -
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jqueryDataTables.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> 
+    <link href="~/css/webfonts.css" rel="stylesheet">
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
