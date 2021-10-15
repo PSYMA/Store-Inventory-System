@@ -22,7 +22,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": "true",
-      "applicationUrl": "http://0.0.0.0:44362;https://0.0.0.0:5000"
+      "applicationUrl": "http://0.0.0.0:44362"
     },
     "WSL 2": {
       "commandName": "WSL2",

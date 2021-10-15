@@ -3,6 +3,7 @@ using InventoryNiDudz.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -54,7 +55,7 @@ namespace InventoryNiDudz.Controllers {
                 update_product.ProductName = product_name;
 
                 await _productRepository.Update(update_product);
-                return Ok("Update success!");
+                return Ok(update_product);
             }
 
             return Ok("Update failed!");
@@ -76,7 +77,7 @@ namespace InventoryNiDudz.Controllers {
                 update_product.Sold += quantity;
 
                 await _productRepository.Update(update_product);
-                return Ok("Sell success!");
+                return Ok(update_product);
             }
 
             return Ok("Sell failed!");
@@ -98,10 +99,10 @@ namespace InventoryNiDudz.Controllers {
                 update_product.Sold -= quantity;
 
                 await _productRepository.Update(update_product);
-                return Ok("Sell success!");
+                return Ok(update_product);
             }
 
-            return Ok("Sell failed!");
+            return Ok("Return failed!");
         }
 
         [HttpDelete]
@@ -111,7 +112,7 @@ namespace InventoryNiDudz.Controllers {
             var delete_product = await _productRepository.Get(id);  
             if (delete_product != null) {
                 await _productRepository.Delete(delete_product.Id);
-                return Ok($"Product ID = {id} has been deleted!");
+                return Ok(delete_product);
             }
 
             return Ok("No deletion!");
@@ -129,6 +130,26 @@ namespace InventoryNiDudz.Controllers {
         [Produces("application/json")]
         public async Task<IActionResult> GetProducts() {  
             return Ok(await _productRepository.Get());
+        }
+
+        [HttpPost]
+        [Route("[controller]/Logging")]
+        [Produces("application/json")]
+        public async Task<IActionResult> Logging([FromBody] object logs) {
+            var json_map = JsonSerializer.Deserialize<Dictionary<string, string>>(logs.ToString());
+
+            var action = json_map["Action"];
+            var msg = json_map["Message"];
+
+            var dir = Directory.GetCurrentDirectory() + "\\" + action;
+            Directory.CreateDirectory(dir);
+
+            using(var sw = new StreamWriter(dir + $"\\{DateTime.Now.ToLongDateString()}.txt", true)) {
+                sw.WriteLine(msg);
+            }
+
+
+            return Ok(await Task.FromResult("Logs updated!"));
         }
     }
 }

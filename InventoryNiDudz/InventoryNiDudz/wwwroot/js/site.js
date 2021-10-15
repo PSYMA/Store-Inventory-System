@@ -10,6 +10,8 @@ let product_to_sell_id = -1
 let product_to_return_id = -1
 let product_quantity_to_sell = -1
 let product_to_return_sale_price = -1
+let customer_payment = -1;
+let customer_change = -1;
 let table = null
 
 $(function ($) {
@@ -91,6 +93,8 @@ function SaveProduct() {
             if (save) {
                 CreateProduct(quantity, cost_price, sale_price, product_name).then((item) => {
                     GetProductsListTable()
+                    let new_item = `Product name: ${item.productName}, Cost price: ${item.costPrice}, Sale price: ${item.salePrice}, Quantity: ${item.quantity}, Sold: ${item.sold}`
+                    Logging("Added products", `Time: [${new Date().toLocaleString()}] \nItem: [${new_item}]\n`)
                 })
             }
         }
@@ -178,6 +182,8 @@ function ConfirmDeleteProduct() {
     $('#confirm_delete_product_btn').on("click", () => {
         DeleteProduct(product_to_delete_id).then((item) => {
             GetProductsListTable()
+            let new_item = `Product name: ${item.productName}, Cost price: ${item.costPrice}, Sale price: ${item.salePrice}, Quantity: ${item.quantity}, Sold: ${item.sold}`
+            Logging("Deleted products", `Time: [${new Date().toLocaleString()}] \nItem: [${new_item}]\n`)
         })
     })
 }
@@ -192,11 +198,20 @@ function UpdateProductSingleProduct() {
         if (!/\S/.test(product_name) || !/\S/.test(cost_price) || !/\S/.test(sale_price) || !/\S/.test(quantity)) {
             save = false
         }
+        else if (parseFloat(cost_price) > parseFloat(sale_price)) {
+            save = false
+        }
 
-        if (save) {
-            UpdateProduct(product_to_update_id, quantity, cost_price, sale_price, product_name).then((item) => {
-                GetProductsListTable()
+        if (save) { 
+            GetProduct(product_to_update_id).then((item) => {
+                let old_item = `Product name: ${item.productName}, Cost price: ${item.costPrice}, Sale price: ${item.salePrice}, Quantity: ${item.quantity}, Sold: ${item.sold}`
+                UpdateProduct(product_to_update_id, quantity, cost_price, sale_price, product_name).then((item) => {
+                    GetProductsListTable()
+                    let new_item = `Product name: ${item.productName}, Cost price: ${item.costPrice}, Sale price: ${item.salePrice}, Quantity: ${item.quantity}, Sold: ${item.sold}`
+                    Logging("Updated products", `Time:   [${new Date().toLocaleString()}] \nBefore: [${old_item}] \nAfter:  [${new_item}]\n`)
+                })
             })
+            
         } 
     })
 }
@@ -224,7 +239,8 @@ function SellSingleProduct() {
         $('#change_p').css({ fontSize: '17px', fontFamily: 'Lucida Console' })
 
         change < 0 ? $('#change_p').css({ color: "red" }) : $('#change_p').css({ color: "black" })
-
+        customer_payment = payment
+        customer_change = change
         if (quantity > 0 && payment >= total) {
             $('#confirm_sell_product_btn').prop("disabled", false)
         }
@@ -240,15 +256,23 @@ function SellSingleProduct() {
         SellProduct(product_to_sell_id, product_quantity_to_sell).then((item) => {
             $('#sell_product_modal').modal('hide')
             GetProductsListTable()
+            let new_item = `Product name: ${item.productName}, Cost price: ${item.costPrice}, Sale price: ${item.salePrice}, Quantity: ${item.quantity}, Sold: ${item.sold}, [Bought: ${product_quantity_to_sell} Payment: ${customer_payment}: Change: ${customer_change}]`
+            Logging("Sold products", `Time: [${new Date().toLocaleString()}] \nItem: [${new_item}]\n`)
         })
     })
 }
 function ReturnSingleProduct() {
     $('#return_product_btn').on("click", () => {
-        let quantity = $('#return_product_quantity_input').val()
-        ReturnProduct(product_to_return_id, quantity).then((item) => {
-            GetProductsListTable()
+        let quantity = $('#return_product_quantity_input').val() 
+        GetProduct(product_to_return_id).then((item) => { 
+            let old_item = `Product name: ${item.productName}, Cost price: ${item.costPrice}, Sale price: ${item.salePrice}, Quantity: ${item.quantity}, Sold: ${item.sold}`
+            ReturnProduct(product_to_return_id, quantity).then((item) => {
+                GetProductsListTable()
+                let new_item = `Product name: ${item.productName}, Cost price: ${item.costPrice}, Sale price: ${item.salePrice}, Quantity: ${item.quantity}, Sold: ${item.sold}`
+                Logging("Returned products", `Time:   [${new Date().toLocaleString()}] \nBefore: [${old_item}] \nAfter:  [${new_item}]\n`)
+            })
         })
+        
     }) 
 }
 function GetProductsListTable() { 
@@ -408,6 +432,24 @@ async function DeleteProduct(id) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
+    });
+
+    return await response.json();
+}
+async function Logging(action, msg) {
+    const data = {
+        "Action": action.toString(),
+        "Message": msg.toString()
+    }
+
+    let url = host + `/api/Logging?logs`
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
     });
 
     return await response.json();
